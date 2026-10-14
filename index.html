@@ -440,7 +440,60 @@
         .card-speak { position:absolute; top:8px; right:10px; width:38px; height:38px; font-size:18px; }
         .tts-status { margin:8px 0 12px; padding:8px 10px; border-radius:8px; background:#fff7ed; color:#9a3412; font-size:12px; line-height:1.5; }
         .tts-status[hidden] { display:none; }
-    </style>
+
+    /* 모든 메뉴를 스와이프 없이 한 화면에서 확인할 수 있도록 줄바꿈 그리드로 표시 */
+    .nav-tabs { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); overflow:visible; overflow-x:visible; gap:6px; }
+    .nav-tab { min-width:0; white-space:normal; text-align:center; line-height:1.25; }
+    @media (max-width: 620px) {
+        .nav-tabs { grid-template-columns:repeat(4,minmax(0,1fr)); }
+        .nav-tab { padding:10px 3px; font-size:clamp(11px,3.1vw,14px); }
+    }
+    @media (max-width: 360px) {
+        .nav-tabs { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
+    .tts-extra-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:8px 0 12px; padding:10px 12px; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc; color:#475569; font-size:13px; }
+    .tts-extra-controls label { display:flex; align-items:center; gap:7px; }
+    .tts-extra-controls input[type="range"] { width:104px; accent-color:#4f46e5; }
+    .tts-extra-controls select { padding:5px 8px; border:1px solid #cbd5e1; border-radius:8px; background:white; color:#334155; }
+    .feature-panel { margin:16px 0; padding:14px; border:1px solid #e2e8f0; border-radius:14px; background:#f8fafc; }
+    .feature-panel h3 { margin:0 0 8px; color:#334155; font-size:16px; }
+    .feature-panel p { margin:6px 0 10px; color:#64748b; font-size:13px; line-height:1.55; }
+    .daily-goal-controls,.feature-panel-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; }
+    .daily-goal-controls input { width:82px; padding:7px 8px; border:1px solid #cbd5e1; border-radius:8px; font:inherit; }
+    .daily-goal-summary { margin:9px 0 7px; color:#334155; font-size:14px; font-weight:700; }
+    .daily-goal-track { width:100%; height:10px; overflow:hidden; border-radius:99px; background:#e2e8f0; }
+    .daily-goal-fill { width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#6366f1,#22c55e); transition:width .2s ease; }
+    .srs-schedule-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:10px 0; }
+    .srs-schedule-stat { padding:9px 6px; border:1px solid #e2e8f0; border-radius:10px; background:white; text-align:center; }
+    .srs-schedule-stat strong { display:block; color:#3730a3; font-size:17px; }
+    .srs-schedule-stat span { display:block; margin-top:3px; color:#64748b; font-size:11px; }
+    .srs-schedule-days { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+    .srs-schedule-day { padding:8px 6px; border:1px solid #e2e8f0; border-radius:10px; background:white; text-align:center; }
+    .srs-schedule-day-label { color:#64748b; font-size:11px; }
+    .srs-schedule-day-count { margin:4px 0; color:#1e293b; font-size:15px; font-weight:700; }
+    .srs-schedule-bar { height:5px; overflow:hidden; border-radius:99px; background:#e2e8f0; }
+    .srs-schedule-bar span { display:block; height:100%; border-radius:inherit; background:#6366f1; }
+    .focus-review-list { display:grid; gap:7px; margin-top:8px; }
+    .focus-review-entry { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px; border:1px solid #e2e8f0; border-radius:10px; background:white; }
+    .focus-review-copy { min-width:0; }
+    .focus-review-word { color:#1e293b; font-weight:700; overflow-wrap:anywhere; }
+    .focus-review-detail { margin-top:3px; color:#64748b; font-size:12px; overflow-wrap:anywhere; }
+    .focus-review-badges { margin-top:4px; color:#4f46e5; font-size:11px; }
+    .focus-review-remove,.srs-bookmark-btn { padding:6px 8px; border:1px solid #c7d2fe; border-radius:8px; background:#eef2ff; color:#4338ca; font-size:11px; font-weight:700; cursor:pointer; }
+    .srs-bookmark-btn.is-bookmarked { border-color:#facc15; background:#fef9c3; color:#854d0e; }
+    .backup-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .backup-file-input { display:none; }
+    .backup-status { min-height:1.4em; margin-top:8px; color:#475569; font-size:12px; }
+    .listening-panel { margin-top:14px; }
+    .listening-replay { margin:8px 0; }
+    .listening-prompt { margin:8px 0; color:#334155; font-weight:700; }
+    .listening-answer-word { margin:10px 0; font-size:24px; font-weight:700; text-align:center; }
+    .listening-options { display:grid; gap:8px; }
+    @media (max-width: 420px) {
+        .srs-schedule-days { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+
+</style>
 </head>
 <body>
 
@@ -464,7 +517,8 @@
             </select>
         </div>
         <button id="furiganaToggle" class="furigana-toggle" type="button" onclick="toggleFurigana()">후리가나: 켜짐</button>
-        <button class="furigana-toggle" id="ttsAutoToggle" type="button" onclick="toggleTtsAuto()">자동 읽기: 꺼짐</button>
+        <button class="furigana-toggle" id="ttsAutoToggle" onclick="toggleTtsAuto()" type="button">자동 읽기: 꺼짐</button>
+<div class="tts-extra-controls" aria-label="일본어 음성 설정"><label for="ttsRateInput">발음 속도 <input id="ttsRateInput" type="range" min="0.6" max="1.4" step="0.1" value="0.9" oninput="changeTtsRate(this.value)"> <span id="ttsRateValue">0.9×</span></label><label for="ttsRepeatSelect">반복 <select id="ttsRepeatSelect" onchange="changeTtsRepeatCount(this.value)"><option value="1">1회</option><option value="2">2회</option><option value="3">3회</option></select></label></div>
         <div class="tts-status" id="ttsStatus" role="status" hidden></div>
         <div class="card" id="flashcard" onclick="toggleCard()">
             <div class="card-level-badge" id="levelBadge">N5</div>
@@ -498,7 +552,7 @@
                 <option value="ALL">전체 분류</option><option value="N5">JLPT N5</option><option value="N4">JLPT N4</option><option value="N3">JLPT N3</option><option value="N2">JLPT N2</option><option value="N1">JLPT N1</option><option value="BASIC">필수 어휘</option><option value="KANJI">한자 2136</option>
             </select>
             <label for="vocabReviewFilter">복습 시점</label>
-            <select id="vocabReviewFilter" class="level-select srs-filter" onchange="renderVocabList()"><option value="ALL">전체 단어</option><option value="DUE">오늘 복습할 단어</option><option value="LATER">복습 예정 단어</option></select>
+            <select class="level-select srs-filter" id="vocabReviewFilter" onchange="renderVocabList()"><option value="ALL">전체 단어</option><option value="DUE">오늘 복습할 단어</option><option value="LATER">복습 예정 단어</option><option value="FOCUS">오답·북마크</option></select>
         </div>
         <input id="vocabSearch" type="search" placeholder="단어·읽기·뜻 검색" autocomplete="off">
         <div id="vocabCount" class="list-count"></div>
@@ -548,7 +602,23 @@
         </div>
         <button id="quizFuriganaToggle" class="furigana-toggle" type="button" onclick="toggleFurigana()">후리가나: 켜짐</button>
         <p class="quiz-note">복습 시기가 된 단어만 출제되며, 틀린 문제는 회차 끝에 다시 나옵니다.</p>
-        <button class="btn" type="button" onclick="startQuiz()">어휘 퀴즈 시작</button>
+        <button class="btn" onclick="startQuiz()" type="button">어휘 퀴즈 시작</button>
+<div class="feature-panel listening-panel">
+<h3>듣기 퀴즈</h3>
+<p>일본어 표기를 가린 채 발음을 듣고 한국어 뜻을 고릅니다. 현재 퀴즈 급수의 복습 대상에서 최대 10문항을 출제하며, 틀린 문제는 마지막에 다시 나옵니다.</p>
+<button class="btn" id="startListeningQuizButton" onclick="startListeningQuiz()" type="button">🎧 듣기 퀴즈 시작</button>
+<div class="quiz-panel" hidden id="listeningQuizPanel">
+<div class="quiz-progress" id="listeningQuizProgress"></div>
+<div class="quiz-question-card">
+<div class="listening-prompt" id="listeningPrompt">소리를 듣고 뜻을 선택하세요.</div>
+<button class="furigana-toggle listening-replay" id="listeningReplayButton" onclick="replayListeningQuestion()" type="button">🔊 다시 듣기</button>
+<div class="listening-answer-word" id="listeningAnswerWord" hidden></div>
+<div class="listening-options" id="listeningOptions"></div>
+<div class="quiz-feedback" id="listeningFeedback" role="status"></div>
+</div>
+<button class="btn quiz-next" hidden id="listeningNextButton" onclick="nextListeningQuestion()" type="button">다음 문제</button>
+</div>
+</div>
         <div id="quizPanel" class="quiz-panel" hidden>
             <div id="quizProgress" class="quiz-progress"></div>
             <div class="quiz-question-card"><div class="quiz-meta"><span id="quizLevelBadge" class="quiz-level-badge"></span><span id="quizSrsBadge" class="quiz-srs-badge"></span></div><div id="quizQuestion" class="quiz-question"></div><div id="quizOptions" class="quiz-options"></div><div id="quizFeedback" class="quiz-feedback" role="status"></div></div>
@@ -638,7 +708,34 @@
             <label for="historyType">학습 종류</label>
             <select id="historyType" class="level-select" onchange="renderActivityHistory()"><option value="ALL">전체 종류</option><option value="vocab">어휘·단어장</option><option value="grammar">문법</option><option value="eju">EJU</option></select>
         </div>
-        <div id="activityHistory" class="activity-list" aria-live="polite"></div>
+        <div aria-live="polite" class="activity-list" id="activityHistory"></div>
+<div class="feature-panel" id="dailyGoalPanel">
+<div class="feature-panel-head"><h3>오늘의 목표 · 연속 학습</h3>
+<div class="daily-goal-controls"><label for="dailyGoalTarget">하루 학습 목표</label><input id="dailyGoalTarget" type="number" min="1" max="200" value="20" onchange="changeDailyGoal(this.value)"></div></div>
+<div class="daily-goal-summary" id="dailyGoalSummary" aria-live="polite"></div>
+<div class="daily-goal-track" role="progressbar" aria-label="오늘 목표 달성률" aria-valuemin="0" aria-valuemax="100"><div class="daily-goal-fill" id="dailyGoalBar"></div></div>
+</div>
+<div class="feature-panel">
+<h3>복습 일정</h3>
+<p>어휘·문법·EJU의 다음 복습 날짜를 모아 오늘과 앞으로 7일의 예정량을 보여줍니다.</p>
+<div id="srsScheduleSummary" aria-live="polite"></div>
+</div>
+<div class="feature-panel">
+<div class="feature-panel-head"><h3>오답 노트 · 북마크</h3><button class="btn" id="focusReviewButton" onclick="startFocusedReview()" type="button">어휘 집중 복습</button></div>
+<p>틀린 항목은 자동으로 모이고, 단어장에서 별표로 북마크할 수 있습니다. 정답으로 기억하면 오답 상태가 자동 해제됩니다.</p>
+<div class="focus-review-list" id="focusReviewList" aria-live="polite"></div>
+</div>
+<div class="feature-panel">
+<h3>진도 백업 · 복원</h3>
+<p>단어장, SRS 복습일, 학습 기록, 오답·북마크, 목표와 음성 설정을 JSON으로 백업합니다. 복원 전에는 현재 데이터도 안전 백업으로 다운로드합니다.</p>
+<div class="backup-actions">
+<button class="btn" onclick="exportAppBackup()" type="button">JSON 백업 저장</button>
+<button class="btn" onclick="document.getElementById('backupImportFile').click()" type="button">백업 파일 불러오기</button>
+<input class="backup-file-input" id="backupImportFile" type="file" accept="application/json,.json" onchange="importAppBackup(this.files && this.files[0])">
+</div>
+<div class="backup-status" id="backupStatus" aria-live="polite"></div>
+</div>
+
         <button class="btn" type="button" onclick="exportReviewStats()">학습 기록 CSV로 내보내기</button>
     </section>
 </div>
@@ -744,14 +841,40 @@
         box.textContent = message;
         box.hidden = !message;
     }
+    let ttsRepeatCount = Math.max(1, Math.min(3, Math.floor(Number(localStorage.getItem('jlpt_tts_repeat') || 1))));
+    let ttsRequestToken = 0;
+    function changeTtsRate(value) {
+        const rate = Number(value);
+        if (!Number.isFinite(rate)) return;
+        ttsRate = Math.max(0.6, Math.min(1.4, Math.round(rate * 10) / 10));
+        localStorage.setItem('jlpt_tts_rate', String(ttsRate));
+        updateTtsControls();
+    }
+    function changeTtsRepeatCount(value) {
+        ttsRepeatCount = Math.max(1, Math.min(3, Math.floor(Number(value) || 1)));
+        localStorage.setItem('jlpt_tts_repeat', String(ttsRepeatCount));
+        updateTtsControls();
+    }
     function speakJapanese(text) {
         if (!text || !('speechSynthesis' in window) || !window.SpeechSynthesisUtterance) { updateTtsStatus(); return; }
+        const token = ++ttsRequestToken;
         window.speechSynthesis.cancel();
-        const utterance = new window.SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP';
-        if (jaVoice) utterance.voice = jaVoice;
-        utterance.rate = ttsRate;
-        window.speechSynthesis.speak(utterance);
+        let remaining = ttsRepeatCount;
+        const speakNext = () => {
+            if (token !== ttsRequestToken || remaining <= 0) return;
+            const utterance = new window.SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP';
+            if (jaVoice) utterance.voice = jaVoice;
+            utterance.rate = ttsRate;
+            utterance.onend = () => {
+                if (token !== ttsRequestToken) return;
+                remaining--;
+                if (remaining > 0) setTimeout(speakNext, 180);
+            };
+            utterance.onerror = () => { if (token === ttsRequestToken) remaining = 0; };
+            window.speechSynthesis.speak(utterance);
+        };
+        speakNext();
     }
     function makeSpeakButton(item, extraClass) {
         const button = document.createElement('button');
@@ -778,6 +901,12 @@
     function updateTtsControls() {
         const toggle = document.getElementById('ttsAutoToggle');
         if (toggle) toggle.textContent = `자동 읽기: ${ttsAuto ? '켜짐' : '꺼짐'}`;
+        const rateInput = document.getElementById('ttsRateInput');
+        const rateValue = document.getElementById('ttsRateValue');
+        const repeatSelect = document.getElementById('ttsRepeatSelect');
+        if (rateInput) rateInput.value = String(ttsRate);
+        if (rateValue) rateValue.textContent = `${Number(ttsRate).toFixed(1)}×`;
+        if (repeatSelect) repeatSelect.value = String(ttsRepeatCount);
     }
     function toggleTtsAuto() {
         ttsAuto = !ttsAuto;
@@ -942,6 +1071,9 @@
         const summary = document.getElementById('historySummary');
         const list = document.getElementById('activityHistory');
         if (!summary || !list) return;
+        renderDailyGoal();
+        renderSrsSchedule();
+        renderFocusReview();
         const today = localDayKey(Date.now());
         const todays = activityLog.filter(row => localDayKey(row.timestamp) === today);
         const attempts = todays.filter(row => row.result === '정답·기억함' || row.result === '오답·복습 필요');
@@ -1049,6 +1181,464 @@
         }
     }
 
+
+    // ===== 추가 학습 기능: 오답·북마크, 목표·일정, 백업 =====
+    const FOCUS_REVIEW_STORAGE_KEY = 'jlpt_focus_review_v1';
+    const DAILY_GOAL_STORAGE_KEY = 'jlpt_daily_goal_v1';
+    const APP_BACKUP_ID = 'jlpt-eju-smart-study';
+
+    function readJsonStorage(key, fallback) {
+        try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : fallback;
+        } catch (error) {
+            console.warn(`저장값을 읽지 못했습니다: ${key}`, error);
+            return fallback;
+        }
+    }
+    function loadFocusReviewState() {
+        const value = readJsonStorage(FOCUS_REVIEW_STORAGE_KEY, {});
+        return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    }
+    function saveFocusReviewState() {
+        try { localStorage.setItem(FOCUS_REVIEW_STORAGE_KEY, JSON.stringify(focusReviewState)); }
+        catch (error) { console.warn('오답·북마크를 저장하지 못했습니다.', error); }
+    }
+    let focusReviewState = loadFocusReviewState();
+
+    function loadDailyGoalState() {
+        const value = readJsonStorage(DAILY_GOAL_STORAGE_KEY, {});
+        const target = Math.max(1, Math.min(200, Math.floor(Number(value && value.target) || 20)));
+        return {
+            target,
+            attemptsByDay: value && value.attemptsByDay && typeof value.attemptsByDay === 'object' ? value.attemptsByDay : {},
+            completedDays: value && value.completedDays && typeof value.completedDays === 'object' ? value.completedDays : {}
+        };
+    }
+    function saveDailyGoalState() {
+        try { localStorage.setItem(DAILY_GOAL_STORAGE_KEY, JSON.stringify(dailyGoalState)); }
+        catch (error) { console.warn('일일 목표 기록을 저장하지 못했습니다.', error); }
+    }
+    let dailyGoalState = loadDailyGoalState();
+
+    function cloneFocusItem(item) {
+        try { return JSON.parse(JSON.stringify(item || {})); }
+        catch (_) { return {}; }
+    }
+    function updateFocusReviewState(type, item, remembered) {
+        const key = srsKey(type, item);
+        let row = focusReviewState[key];
+        if (remembered) {
+            if (!row) return;
+            row.needsReview = false;
+        } else {
+            row = row || { type, wrongCount: 0, bookmarked: false, needsReview: false };
+            row.needsReview = true;
+            row.wrongCount = Number(row.wrongCount || 0) + 1;
+        }
+        row.type = type;
+        row.itemSnapshot = cloneFocusItem(item);
+        row.updatedAt = new Date().toISOString();
+        if (!row.needsReview && !row.bookmarked) delete focusReviewState[key];
+        else focusReviewState[key] = row;
+        saveFocusReviewState();
+    }
+    function toggleFocusBookmark(item) {
+        const key = srsKey('vocab', item);
+        const row = focusReviewState[key] || { type: 'vocab', wrongCount: 0, needsReview: false, bookmarked: false };
+        row.type = 'vocab';
+        row.bookmarked = !row.bookmarked;
+        row.itemSnapshot = cloneFocusItem(item);
+        row.updatedAt = new Date().toISOString();
+        if (!row.bookmarked && !row.needsReview) delete focusReviewState[key];
+        else focusReviewState[key] = row;
+        saveFocusReviewState();
+        renderVocabList();
+        renderFocusReview();
+    }
+    function dismissFocusEntry(key) {
+        delete focusReviewState[key];
+        saveFocusReviewState();
+        renderFocusReview();
+        renderVocabList();
+    }
+    function renderFocusReview() {
+        const list = document.getElementById('focusReviewList');
+        const button = document.getElementById('focusReviewButton');
+        if (!list) return;
+        const rows = Object.entries(focusReviewState)
+            .filter(([, row]) => row && (row.needsReview || row.bookmarked))
+            .sort((a, b) => String(b[1].updatedAt || '').localeCompare(String(a[1].updatedAt || '')));
+        const vocabCount = rows.filter(([, row]) => row.type === 'vocab').length;
+        if (button) {
+            button.textContent = `어휘 집중 복습 (${vocabCount})`;
+            button.disabled = vocabCount === 0;
+        }
+        list.replaceChildren();
+        if (!rows.length) {
+            const empty = document.createElement('div');
+            empty.className = 'history-empty';
+            empty.textContent = '아직 오답이나 북마크가 없습니다. 단어장에서 별표를 누르거나 퀴즈를 풀어보세요.';
+            list.appendChild(empty);
+            return;
+        }
+        const labels = { vocab: '어휘', grammar: '문법', eju: 'EJU' };
+        for (const [key, row] of rows.slice(0, 100)) {
+            let item = row.itemSnapshot || {};
+            if (row.type === 'vocab' && typeof allWords !== 'undefined') {
+                item = allWords.find(candidate => srsKey('vocab', candidate) === key) || item;
+            }
+            const entry = document.createElement('article');
+            entry.className = 'focus-review-entry';
+            const copy = document.createElement('div');
+            copy.className = 'focus-review-copy';
+            const word = document.createElement('div');
+            word.className = 'focus-review-word';
+            word.textContent = `${labels[row.type] || row.type || '항목'} · ${item.word || item.expression || item.question || item.label || '학습 항목'}`;
+            const detail = document.createElement('div');
+            detail.className = 'focus-review-detail';
+            detail.textContent = String(item.sub || item.meaning || item.focus || item.detail || '').slice(0, 220);
+            const badges = document.createElement('div');
+            badges.className = 'focus-review-badges';
+            const flags = [];
+            if (row.needsReview) flags.push(`오답 ${Number(row.wrongCount || 1)}회`);
+            if (row.bookmarked) flags.push('★ 북마크');
+            if (row.updatedAt) flags.push(new Date(row.updatedAt).toLocaleDateString('ko-KR'));
+            badges.textContent = flags.join(' · ');
+            copy.append(word, detail, badges);
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'focus-review-remove';
+            remove.textContent = '해제';
+            remove.setAttribute('aria-label', '오답·북마크에서 해제');
+            remove.addEventListener('click', () => dismissFocusEntry(key));
+            entry.append(copy, remove);
+            list.appendChild(entry);
+        }
+    }
+    function startFocusedReview() {
+        const keys = new Set(Object.entries(focusReviewState)
+            .filter(([, row]) => row && row.type === 'vocab' && (row.needsReview || row.bookmarked))
+            .map(([key]) => key));
+        const items = allWords.filter(item => keys.has(srsKey('vocab', item)));
+        if (!items.length) {
+            const status = document.getElementById('backupStatus');
+            if (status) status.textContent = '집중 복습할 어휘가 없습니다.';
+            return;
+        }
+        const level = document.getElementById('levelFilter');
+        if (level) level.value = 'ALL';
+        const cardButton = [...document.querySelectorAll('.nav-tab')].find(node => node.textContent.trim() === '카드');
+        switchTab('flashcard', cardButton);
+        filteredWords = items;
+        studyQueue = items.map(item => ({ item, kind: 'new' }));
+        scopeWordCount = items.length;
+        sessionNewTotal = items.length;
+        currentIndex = 0;
+        knownWords = new Set();
+        needsReview = new Set();
+        initiallySeen = new Set();
+        reviewSeen = 0;
+        updateReviewStats();
+        updateCard();
+    }
+
+    function updateDailyGoalAfterAnswer() {
+        const today = localDayKey(Date.now());
+        const count = Math.max(0, Number(dailyGoalState.attemptsByDay[today] || 0)) + 1;
+        dailyGoalState.attemptsByDay[today] = count;
+        if (count >= dailyGoalState.target && !dailyGoalState.completedDays[today]) {
+            dailyGoalState.completedDays[today] = { target: dailyGoalState.target, completedAt: new Date().toISOString() };
+        }
+        saveDailyGoalState();
+    }
+    function changeDailyGoal(value) {
+        const target = Math.max(1, Math.min(200, Math.floor(Number(value) || 20)));
+        dailyGoalState.target = target;
+        const today = localDayKey(Date.now());
+        const count = Number(dailyGoalState.attemptsByDay[today] || 0);
+        if (count >= target && !dailyGoalState.completedDays[today]) {
+            dailyGoalState.completedDays[today] = { target, completedAt: new Date().toISOString() };
+        }
+        saveDailyGoalState();
+        renderDailyGoal();
+    }
+    function currentStudyStreak() {
+        const completed = dailyGoalState.completedDays || {};
+        let cursor = new Date();
+        cursor.setHours(0, 0, 0, 0);
+        let key = localDayKey(cursor);
+        if (!completed[key]) {
+            cursor.setDate(cursor.getDate() - 1);
+            key = localDayKey(cursor);
+        }
+        let streak = 0;
+        while (completed[key] && streak < 3660) {
+            streak++;
+            cursor.setDate(cursor.getDate() - 1);
+            key = localDayKey(cursor);
+        }
+        return streak;
+    }
+    function renderDailyGoal() {
+        const summary = document.getElementById('dailyGoalSummary');
+        const bar = document.getElementById('dailyGoalBar');
+        const input = document.getElementById('dailyGoalTarget');
+        if (!summary || !bar) return;
+        const today = localDayKey(Date.now());
+        const count = Number(dailyGoalState.attemptsByDay[today] || 0);
+        const target = Math.max(1, Number(dailyGoalState.target || 20));
+        const percent = Math.min(100, Math.round(count / target * 100));
+        const completed = Boolean(dailyGoalState.completedDays[today]) || count >= target;
+        summary.textContent = `오늘 ${count.toLocaleString()} / ${target.toLocaleString()}회 · ${percent}% · 연속 학습 ${currentStudyStreak()}일${completed ? ' · 목표 달성!' : ''}`;
+        bar.style.width = `${percent}%`;
+        const progress = bar.parentElement;
+        if (progress) progress.setAttribute('aria-valuenow', String(percent));
+        if (input && input.value !== String(target)) input.value = String(target);
+    }
+    function renderSrsSchedule() {
+        const root = document.getElementById('srsScheduleSummary');
+        if (!root) return;
+        const now = Date.now();
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        const todayKey = localDayKey(start);
+        const days = [];
+        for (let offset = 0; offset <= 7; offset++) {
+            const date = new Date(start);
+            date.setDate(date.getDate() + offset);
+            days.push({ date, key: localDayKey(date), count: 0 });
+        }
+        const dayMap = new Map(days.map(day => [day.key, day]));
+        let overdue = 0;
+        let readyNow = 0;
+        let total = 0;
+        const collections = [];
+        if (typeof allWords !== 'undefined') collections.push(['vocab', allWords]);
+        if (typeof allGrammarRules !== 'undefined') collections.push(['grammar', allGrammarRules]);
+        if (typeof socialTrivia !== 'undefined') collections.push(['eju', Object.values(socialTrivia).flat()]);
+        for (const [type, items] of collections) {
+            for (const item of items) {
+                const status = getSrsStatus(type, item);
+                const time = Date.parse(status.nextReview);
+                if (!Number.isFinite(time)) continue;
+                total++;
+                if (time <= now) readyNow++;
+                const key = localDayKey(time);
+                if (key < todayKey) overdue++;
+                else if (dayMap.has(key)) dayMap.get(key).count++;
+            }
+        }
+        const upcoming = days.slice(1).reduce((sum, day) => sum + day.count, 0);
+        root.replaceChildren();
+        const stats = document.createElement('div');
+        stats.className = 'srs-schedule-summary';
+        [[readyNow, '지금 복습 가능'], [overdue, '밀린 항목'], [upcoming, '다음 7일 예정']].forEach(([value, label]) => {
+            const card = document.createElement('div'); card.className = 'srs-schedule-stat';
+            const number = document.createElement('strong'); number.textContent = Number(value).toLocaleString();
+            const caption = document.createElement('span'); caption.textContent = label;
+            card.append(number, caption); stats.appendChild(card);
+        });
+        root.appendChild(stats);
+        const grid = document.createElement('div'); grid.className = 'srs-schedule-days';
+        const maxCount = Math.max(1, ...days.map(day => day.count));
+        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+        for (const day of days) {
+            const card = document.createElement('div'); card.className = 'srs-schedule-day';
+            const label = document.createElement('div'); label.className = 'srs-schedule-day-label';
+            label.textContent = day.key === todayKey ? '오늘' : `${day.date.getMonth() + 1}/${day.date.getDate()} (${weekdays[day.date.getDay()]})`;
+            const count = document.createElement('div'); count.className = 'srs-schedule-day-count';
+            count.textContent = `${day.count.toLocaleString()}개`;
+            const track = document.createElement('div'); track.className = 'srs-schedule-bar';
+            const fill = document.createElement('span'); fill.style.width = `${Math.round(day.count / maxCount * 100)}%`;
+            track.appendChild(fill); card.append(label, count, track); grid.appendChild(card);
+        }
+        root.appendChild(grid);
+        const note = document.createElement('div'); note.className = 'history-empty';
+        note.textContent = `총 ${total.toLocaleString()}개 항목 · 기기 현지 날짜 기준 · 밀린 항목은 오늘 복습 수에 포함됩니다.`;
+        root.appendChild(note);
+    }
+
+    function collectAppStorage() {
+        const data = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('jlpt_')) data[key] = localStorage.getItem(key);
+        }
+        return data;
+    }
+    function buildAppBackupPayload(storage = collectAppStorage()) {
+        return { appId: APP_BACKUP_ID, schemaVersion: 1, exportedAt: new Date().toISOString(), storage };
+    }
+    function validateAppBackupPayload(payload) {
+        if (!payload || payload.appId !== APP_BACKUP_ID || payload.schemaVersion !== 1) {
+            throw new Error('이 앱에서 만든 JSON 백업 파일이 아닙니다.');
+        }
+        if (!payload.storage || typeof payload.storage !== 'object' || Array.isArray(payload.storage)) {
+            throw new Error('백업 파일의 저장 데이터 형식이 올바르지 않습니다.');
+        }
+        const storage = {};
+        for (const [key, value] of Object.entries(payload.storage)) {
+            if (!key.startsWith('jlpt_') || typeof value !== 'string') {
+                throw new Error('백업 파일에 허용되지 않는 데이터가 포함되어 있습니다.');
+            }
+            storage[key] = value;
+        }
+        if (!Object.keys(storage).length) throw new Error('백업 파일에 복원할 학습 데이터가 없습니다.');
+        return storage;
+    }
+    function triggerAppBackupDownload(storage, suffix = '') {
+        const payload = buildAppBackupPayload(storage);
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        link.href = url;
+        link.download = `jlpt-eju-backup${suffix ? '-' + suffix : ''}-${stamp}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+    function exportAppBackup() {
+        const status = document.getElementById('backupStatus');
+        try {
+            triggerAppBackupDownload(collectAppStorage());
+            if (status) status.textContent = '현재 학습 데이터를 JSON 파일로 저장했습니다.';
+        } catch (error) {
+            if (status) status.textContent = `백업을 저장하지 못했습니다: ${error.message}`;
+        }
+    }
+    async function importAppBackup(file) {
+        const status = document.getElementById('backupStatus');
+        const input = document.getElementById('backupImportFile');
+        if (!file) return;
+        try {
+            if (file.size > 20 * 1024 * 1024) throw new Error('20MB 이하의 백업 파일만 불러올 수 있습니다.');
+            const payload = JSON.parse(await file.text());
+            const incoming = validateAppBackupPayload(payload);
+            if (!window.confirm('현재 브라우저의 JLPT/EJU 앱 저장 데이터가 이 백업으로 교체됩니다. 현재 데이터의 안전 백업을 먼저 다운로드하고 계속할까요?')) return;
+            const previous = collectAppStorage();
+            // 복원 전에 현재 데이터를 별도 파일로 내려받아 되돌릴 수 있게 합니다.
+            triggerAppBackupDownload(previous, 'before-restore');
+            try {
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('jlpt_')) localStorage.removeItem(key);
+                }
+                for (const [key, value] of Object.entries(incoming)) localStorage.setItem(key, value);
+            } catch (error) {
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('jlpt_')) localStorage.removeItem(key);
+                }
+                for (const [key, value] of Object.entries(previous)) localStorage.setItem(key, value);
+                throw new Error(`복원 중 오류가 발생해 기존 데이터를 되돌렸습니다: ${error.message}`);
+            }
+            if (status) status.textContent = '복원 완료. 잠시 후 저장된 데이터로 앱을 다시 불러옵니다.';
+            setTimeout(() => window.location.reload(), 700);
+        } catch (error) {
+            if (status) status.textContent = `백업을 불러오지 못했습니다: ${error.message}`;
+        } finally {
+            if (input) input.value = '';
+        }
+    }
+
+    // 듣기 퀴즈: 일본어 표기는 숨기고 음성으로 뜻을 맞힙니다.
+    let listeningDeck = [];
+    let listeningIndex = 0;
+    let listeningScore = 0;
+    let listeningCurrent = null;
+    let listeningAnswered = false;
+    function startListeningQuiz() {
+        const level = document.getElementById('quizLevel').value;
+        const inScope = allWords.filter(item => level === 'ALL' || item.level === level);
+        const due = inScope.filter(item => item.sub && isSrsDue('vocab', item));
+        const panel = document.getElementById('listeningQuizPanel');
+        panel.hidden = false;
+        listeningDeck = shuffleArray(due).slice(0, 10);
+        listeningIndex = 0;
+        listeningScore = 0;
+        if (!listeningDeck.length) {
+            document.getElementById('listeningPrompt').textContent = inScope.length ? '오늘의 복습 완료!' : '선택한 범위에 단어가 없습니다.';
+            document.getElementById('listeningOptions').replaceChildren();
+            document.getElementById('listeningAnswerWord').hidden = true;
+            document.getElementById('listeningFeedback').textContent = inScope.length ? '오늘 복습할 듣기 문항이 없습니다.' : '다른 급수를 선택하거나 단어를 추가해 주세요.';
+            document.getElementById('listeningQuizProgress').textContent = '오늘의 듣기 복습';
+            document.getElementById('listeningNextButton').hidden = true;
+            return;
+        }
+        showListeningQuestion();
+    }
+    function showListeningQuestion() {
+        const prompt = document.getElementById('listeningPrompt');
+        const optionsBox = document.getElementById('listeningOptions');
+        const answerWord = document.getElementById('listeningAnswerWord');
+        const next = document.getElementById('listeningNextButton');
+        const feedback = document.getElementById('listeningFeedback');
+        if (listeningIndex >= listeningDeck.length) {
+            prompt.textContent = '듣기 퀴즈 완료!';
+            answerWord.hidden = true;
+            optionsBox.replaceChildren();
+            feedback.textContent = `${listeningDeck.length}문제 중 ${listeningScore}문제 정답 · 정답률 ${Math.round(listeningScore / listeningDeck.length * 100)}%`;
+            document.getElementById('listeningQuizProgress').textContent = '이번 듣기 퀴즈 결과';
+            next.hidden = true;
+            return;
+        }
+        listeningCurrent = listeningDeck[listeningIndex];
+        listeningAnswered = false;
+        prompt.textContent = '소리를 듣고 한국어 뜻을 선택하세요.';
+        answerWord.replaceChildren();
+        answerWord.hidden = true;
+        optionsBox.replaceChildren();
+        feedback.textContent = '';
+        next.hidden = true;
+        document.getElementById('listeningQuizProgress').textContent = `문제 ${listeningIndex + 1} / ${listeningDeck.length} · 정답 ${listeningScore}`;
+        const distractors = [...new Set(allWords.filter(item => item.sub && item.sub !== listeningCurrent.sub).map(item => item.sub))];
+        const options = shuffleArray([...new Set([listeningCurrent.sub, ...shuffleArray(distractors).slice(0, 3)])]);
+        for (const option of options) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'quiz-opt-btn';
+            button.textContent = option;
+            button.addEventListener('click', () => answerListeningQuestion(option, button));
+            optionsBox.appendChild(button);
+        }
+        speakJapanese(speechTextFor(listeningCurrent));
+    }
+    function replayListeningQuestion() {
+        if (listeningCurrent) speakJapanese(speechTextFor(listeningCurrent));
+    }
+    function answerListeningQuestion(answer, selectedButton) {
+        if (listeningAnswered || !listeningCurrent) return;
+        listeningAnswered = true;
+        const correct = answer === listeningCurrent.sub;
+        if (correct) listeningScore++;
+        else listeningDeck.push(listeningCurrent);
+        recordSrsAnswer('vocab', listeningCurrent, correct, '듣기 퀴즈');
+        document.querySelectorAll('#listeningOptions .quiz-opt-btn').forEach(button => {
+            button.disabled = true;
+            if (button.textContent === listeningCurrent.sub) button.classList.add('correct');
+        });
+        if (!correct) selectedButton.classList.add('wrong');
+        const answerWord = document.getElementById('listeningAnswerWord');
+        renderWordWithSpeak(answerWord, listeningCurrent);
+        answerWord.hidden = false;
+        document.getElementById('listeningFeedback').textContent = correct
+            ? '정답이에요! 잘 들었어요.'
+            : `아쉬워요. 정답은 “${listeningCurrent.sub}”입니다. 마지막에 다시 출제할게요.`;
+        document.getElementById('listeningQuizProgress').textContent = `문제 ${listeningIndex + 1} / ${listeningDeck.length} · 정답 ${listeningScore}`;
+        const next = document.getElementById('listeningNextButton');
+        next.textContent = listeningIndex + 1 === listeningDeck.length ? '결과 보기' : '다음 문제';
+        next.hidden = false;
+    }
+    function nextListeningQuestion() {
+        if (!listeningAnswered) return;
+        listeningIndex++;
+        showListeningQuestion();
+    }
+    // ===== 추가 학습 기능 끝 =====
+
     function recordSrsAnswer(type, item, remembered, source = '') {
         const previous = getSrsStatus(type, item);
         const srsLevel = remembered ? Math.min(5, previous.srsLevel + 1) : 0;
@@ -1060,6 +1650,8 @@
         const status = { srsLevel, intervalDays, nextReview, lastReviewed: now.toISOString() };
         srsProgress[srsKey(type, item)] = status;
         Object.assign(item, { srsLevel, intervalDays, nextReview });
+        updateFocusReviewState(type, item, remembered);
+        updateDailyGoalAfterAnswer();
         recordActivity(type, item, source || type, remembered ? '정답·기억함' : '오답·복습 필요', status);
         saveSrsProgress();
         if (type === 'vocab' && typeof allWords !== 'undefined') saveStorage();
@@ -1640,6 +2232,7 @@
         const level = document.getElementById('vocabLevel').value;
         const query = document.getElementById('vocabSearch').value.trim().toLocaleLowerCase();
         const reviewFilter = document.getElementById('vocabReviewFilter').value;
+        const focusKeys = new Set(Object.entries(focusReviewState).filter(([, row]) => row && (row.needsReview || row.bookmarked)).map(([key]) => key));
         const list = document.getElementById('vocab-list-container');
         const count = document.getElementById('vocabCount');
         const matches = allWords.filter(item => {
@@ -1647,6 +2240,7 @@
             const due = isSrsDue('vocab', item);
             if (reviewFilter === 'DUE' && !due) return false;
             if (reviewFilter === 'LATER' && due) return false;
+            if (reviewFilter === 'FOCUS' && !focusKeys.has(srsKey('vocab', item))) return false;
             if (!query) return true;
             return `${item.word} ${item.reading || ''} ${item.sub}`.toLocaleLowerCase().includes(query);
         });
@@ -1672,6 +2266,12 @@
             const status = document.createElement('div');
             status.className = 'srs-status';
             status.textContent = formatSrsStatus('vocab', item);
+            const bookmark = document.createElement('button');
+            const bookmarkState = focusReviewState[srsKey('vocab', item)];
+            bookmark.type = 'button'; bookmark.className = 'srs-bookmark-btn' + (bookmarkState && bookmarkState.bookmarked ? ' is-bookmarked' : '');
+            bookmark.textContent = bookmarkState && bookmarkState.bookmarked ? '★ 저장됨' : '☆ 북마크';
+            bookmark.setAttribute('aria-pressed', String(Boolean(bookmarkState && bookmarkState.bookmarked)));
+            bookmark.addEventListener('click', () => toggleFocusBookmark(item));
             const known = document.createElement('button');
             known.type = 'button'; known.className = 'srs-action-btn srs-known'; known.textContent = '외웠어요';
             known.addEventListener('click', () => { recordSrsAnswer('vocab', item, true, '단어장'); renderVocabList(); });
@@ -1679,7 +2279,7 @@
             again.type = 'button'; again.className = 'srs-action-btn srs-again'; again.textContent = '모르겠어요';
             again.addEventListener('click', () => { recordSrsAnswer('vocab', item, false, '단어장'); renderVocabList(); });
             main.append(status);
-            actions.append(known, again);
+            actions.append(bookmark, known, again);
             main.append(actions);
             row.append(main, badge);
             list.appendChild(row);
