@@ -429,6 +429,17 @@
         .vocab-item-actions { flex-wrap:wrap; }
         @media (max-width:420px) { .grammar-expression { font-size:15px; } .grammar-mode-tab { font-size:12px; } .quiz-meta { align-items:flex-start; } }
 
+
+        /* 일본어 발음(TTS) 버튼 */
+        .speak-btn { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; padding:0; border:1px solid #c7d2fe; border-radius:50%; background:#eef2ff; color:#4338ca; font-size:16px; line-height:1; cursor:pointer; vertical-align:middle; flex:none; }
+        .speak-btn:hover { background:#e0e7ff; }
+        .speak-btn:active { transform:scale(.94); }
+        .speak-btn:focus-visible { outline:3px solid #818cf8; outline-offset:2px; }
+        .speak-btn[hidden] { display:none; }
+        .speak-inline { width:28px; height:28px; margin-left:6px; font-size:14px; }
+        .card-speak { position:absolute; top:8px; right:10px; width:38px; height:38px; font-size:18px; }
+        .tts-status { margin:8px 0 12px; padding:8px 10px; border-radius:8px; background:#fff7ed; color:#9a3412; font-size:12px; line-height:1.5; }
+        .tts-status[hidden] { display:none; }
     </style>
 </head>
 <body>
@@ -453,8 +464,11 @@
             </select>
         </div>
         <button id="furiganaToggle" class="furigana-toggle" type="button" onclick="toggleFurigana()">후리가나: 켜짐</button>
+        <button class="furigana-toggle" id="ttsAutoToggle" type="button" onclick="toggleTtsAuto()">자동 읽기: 꺼짐</button>
+        <div class="tts-status" id="ttsStatus" role="status" hidden></div>
         <div class="card" id="flashcard" onclick="toggleCard()">
             <div class="card-level-badge" id="levelBadge">N5</div>
+            <button id="cardSpeak" class="speak-btn card-speak" type="button" aria-label="일본어 발음 듣기" title="발음 듣기" onclick="event.stopPropagation(); speakCurrentCard()" hidden>🔊</button>
             <div class="card-word" id="wordDisplay">단어 로딩중...</div>
             <div class="card-sub" id="subDisplay">한국어 뜻</div>
             <div class="card-reading" id="readingDisplay"></div>
@@ -689,14 +703,104 @@
         });
     }
 
+    // ===== 일본어 발음(TTS): 브라우저 내장 음성 합성(Web Speech API) =====
+    let ttsRate = parseFloat(localStorage.getItem('jlpt_tts_rate')) || 0.9;
+    let ttsAuto = localStorage.getItem('jlpt_tts_auto') === 'true';
+    let jaVoice = null;
+    let userInteracted = false;
+    const cardSpeakBtn = document.getElementById('cardSpeak');
+    document.addEventListener('pointerdown', () => { userInteracted = true; }, { capture: true, once: true });
+    document.addEventListener('keydown', () => { userInteracted = true; }, { capture: true, once: true });
+
+    function speechTextFor(item) {
+        const word = String(item?.word || item?.expression || '').trim();
+        const reading = String(item?.reading || '').trim();
+        const hasKanji = /[\u3400-\u4DBF\u4E00-\u9FFF々ヶ]/.test(word);
+        const kanaOnly = /^[ぁ-ゖァ-ヺー・、/／]+$/;
+        if (reading && hasKanji) return reading.replace(/[\/／]/g, '、').trim();
+        const wholeReading = word.match(/\(([^()]*)\)$/);
+        if (wholeReading && kanaOnly.test(wholeReading[1])) return wholeReading[1].replace(/[\/／]/g, '、');
+        return word
+            .replace(/([ぁ-ゖァ-ヺー]*[\u3400-\u4DBF\u4E00-\u9FFF々ヶ]+)\(([ぁ-ゖァ-ヺー・、/／]+)\)/g, '$2')
+            .replace(/\(([^()]*)\)/g, '')
+            .replace(/[~～〜…]/g, '')
+            .replace(/\s*[\/／]\s*/g, '、')
+            .trim();
+    }
+    function refreshJaVoice() {
+        if (!('speechSynthesis' in window)) return;
+        const ja = window.speechSynthesis.getVoices().filter(v => /^ja([-_]|$)/i.test(v.lang));
+        const preferred = ['Kyoko', 'O-Ren', 'Google 日本語', 'Microsoft Nanami', 'Microsoft Haruka', 'Microsoft Ayumi', 'Otoya', 'Hattori'];
+        jaVoice = preferred.map(name => ja.find(v => v.name.includes(name))).find(Boolean)
+            || ja.find(v => v.localService) || ja[0] || null;
+        updateTtsStatus();
+    }
+    function updateTtsStatus() {
+        const box = document.getElementById('ttsStatus');
+        if (!box) return;
+        let message = '';
+        if (!('speechSynthesis' in window)) message = '이 브라우저는 음성 읽기(TTS)를 지원하지 않습니다.';
+        else if (window.speechSynthesis.getVoices().length && !jaVoice) message = '일본어 음성이 설치되어 있지 않아 발음이 부정확할 수 있어요. 기기 설정의 음성(TTS) 항목에서 일본어를 추가해 주세요.';
+        box.textContent = message;
+        box.hidden = !message;
+    }
+    function speakJapanese(text) {
+        if (!text || !('speechSynthesis' in window) || !window.SpeechSynthesisUtterance) { updateTtsStatus(); return; }
+        window.speechSynthesis.cancel();
+        const utterance = new window.SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+        if (jaVoice) utterance.voice = jaVoice;
+        utterance.rate = ttsRate;
+        window.speechSynthesis.speak(utterance);
+    }
+    function makeSpeakButton(item, extraClass) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'speak-btn' + (extraClass ? ' ' + extraClass : '');
+        button.textContent = '🔊';
+        button.title = '발음 듣기';
+        button.setAttribute('aria-label', '일본어 발음 듣기');
+        button.addEventListener('click', event => { event.stopPropagation(); speakJapanese(speechTextFor(item)); });
+        return button;
+    }
+    function renderWordWithSpeak(target, item) {
+        renderWord(target, item);
+        target.appendChild(makeSpeakButton(item, 'speak-inline'));
+    }
+    function renderGrammarWordWithSpeak(target, item) {
+        const word = { word: item.expression || '', reading: item.reading || '' };
+        renderWordWithSpeak(target, word);
+    }
+    function speakCurrentCard() {
+        const entry = studyQueue[currentIndex];
+        if (entry) speakJapanese(speechTextFor(entry.item));
+    }
+    function updateTtsControls() {
+        const toggle = document.getElementById('ttsAutoToggle');
+        if (toggle) toggle.textContent = `자동 읽기: ${ttsAuto ? '켜짐' : '꺼짐'}`;
+    }
+    function toggleTtsAuto() {
+        ttsAuto = !ttsAuto;
+        localStorage.setItem('jlpt_tts_auto', String(ttsAuto));
+        updateTtsControls();
+        if (ttsAuto) speakCurrentCard();
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.addEventListener('voiceschanged', refreshJaVoice);
+        refreshJaVoice();
+        setTimeout(refreshJaVoice, 1500);
+    }
+    updateTtsControls();
+    // ===== END TTS =====
+
     function toggleFurigana() {
         furiganaEnabled = !furiganaEnabled;
         localStorage.setItem('jlpt_furigana_enabled', String(furiganaEnabled));
         updateFuriganaButton();
-        updateCard();
+        updateCard(false);
         const quizPanel = document.getElementById('quizPanel');
         if (quizPanel && !quizPanel.hidden && quizCurrent && quizIndex < quizDeck.length) {
-            renderWord(document.getElementById('quizQuestion'), quizCurrent);
+            renderWordWithSpeak(document.getElementById('quizQuestion'), quizCurrent);
         }
         renderVocabList();
         if (document.getElementById('dictInput').value.trim()) searchDictionary();
@@ -1168,10 +1272,11 @@
         progressText.innerText = `새 단어 ${initiallySeen.size}/${sessionNewTotal} · 재출제 ${reviewSeen} · 외운 단어 ${knownWords.size} · 복습 필요 ${needsReview.size}`;
     }
 
-    function updateCard() {
+    function updateCard(speakNow = true) {
         isFlipped = false;
         cardEl.classList.remove('show');
         restartWrongButton.hidden = true;
+        cardSpeakBtn.hidden = true;
 
         if (scopeWordCount === 0) {
             levelBadge.innerText = "-";
@@ -1208,11 +1313,13 @@
         const levelLabels = { BASIC: '필수', KANJI: '한자' };
         levelBadge.innerText = levelLabels[currentItem.level] || currentItem.level;
         renderWord(wordDisplay, currentItem);
+        cardSpeakBtn.hidden = false;
         subDisplay.innerText = currentItem.sub;
         readingDisplay.innerText = furiganaEnabled && currentItem.reading ? `읽기: ${currentItem.reading}` : "";
         srsStatusDisplay.textContent = formatSrsStatus('vocab', currentItem);
         cardHint.innerText = entry.kind === 'retry' ? '오늘 다시 복습하는 카드 · 뜻을 확인하세요' : '터치해서 뜻 확인하기';
         updateProgress();
+        if (speakNow && ttsAuto && userInteracted) speakJapanese(speechTextFor(currentItem));
     }
 
     function toggleCard() {
@@ -1552,7 +1659,7 @@
             main.className = 'vocab-item-main';
             const word = document.createElement('div');
             word.className = 'vocab-item-word';
-            renderWord(word, item);
+            renderWordWithSpeak(word, item);
             const meaning = document.createElement('div');
             meaning.className = 'vocab-item-meaning';
             meaning.textContent = item.sub + (item.reading ? ` · 읽기: ${item.reading}` : '');
@@ -1648,7 +1755,7 @@
         const distractors = [...new Set(allWords.filter(item => item.sub && item.sub !== quizCurrent.sub).map(item => item.sub))];
         const answers = shuffleArray([quizCurrent.sub, ...shuffleArray(distractors).slice(0, 3)]);
         quizCurrentOptions = answers;
-        renderWord(question, quizCurrent);
+        renderWordWithSpeak(question, quizCurrent);
         optionsBox.replaceChildren();
         feedback.textContent = '';
         next.hidden = true;
@@ -1861,7 +1968,7 @@
             row.className = 'dict-result-item';
             const word = document.createElement('div');
             word.className = 'dict-result-word';
-            renderWord(word, item);
+            renderWordWithSpeak(word, item);
             const meaning = document.createElement('div');
             meaning.className = 'dict-result-meaning';
             meaning.textContent = item.sub + (item.reading ? ` · 읽기: ${item.reading}` : '');
@@ -1954,7 +2061,7 @@
             head.className = 'grammar-item-head';
             const expression = document.createElement('div');
             expression.className = 'grammar-expression';
-            expression.textContent = item.expression;
+            renderGrammarWordWithSpeak(expression, item);
             const badge = document.createElement('span');
             badge.className = 'grammar-category';
             badge.textContent = item.sections.join(' · ');
@@ -2036,7 +2143,7 @@
         grammarAnswered = false;
         const category = grammarCurrent.sections.join(' · ');
         document.getElementById('grammarQuizCategoryBadge').textContent = category;
-        question.textContent = grammarCurrent.expression;
+        renderGrammarWordWithSpeak(question, grammarCurrent);
         const correct = grammarCurrent.meaning;
         let distractors = [...new Set(allGrammarRules.map(item => item.meaning).filter(value => value && value !== correct))];
         const selectedDistractors = shuffleArray(distractors).slice(0, 3);
